@@ -4,6 +4,15 @@ public class Position {
 
 	public double latitude;
 	public double longitude;
+	final double r = 0.0003; // The drone always travels this distance r
+	
+	// The distance travelled in each direction is calculated above for efficiency.
+	final double sinDist67_5 = r*Math.sin(Math.toRadians(67.5));
+	final double cosDist67_5 = r*Math.cos(Math.toRadians(67.5));
+	final double sinDist45 = r*Math.sin(Math.toRadians(45));
+	final double cosDist45 = r*Math.cos(Math.toRadians(45));
+	final double sinDist22_5 = r*Math.sin(Math.toRadians(22.5));
+	final double cosDist22_5 = r*Math.cos(Math.toRadians(22.5));
 	
 	public Position(double latitude, double longitude) {
 		this.latitude = latitude;
@@ -13,12 +22,12 @@ public class Position {
 	public Position nextPosition(Direction direction) {
 		
 		Position newPos;
-		final double r = 0.0003; // The drone always travels this distance r
+		//final double r = 0.0003; // The drone always travels this distance r
 		
 		// Converting 65.5, 45 and 22.5 degrees to radians in order to use sine and cosine functions later.
-		double rad67_5 = Math.toRadians(67.5); 
-		double rad45 = Math.toRadians(45);
-		double rad22_5 = Math.toRadians(22.5);
+//		double rad67_5 = Math.toRadians(67.5); 
+//		double rad45 = Math.toRadians(45);
+//		double rad22_5 = Math.toRadians(22.5);
 		
 		
 		// If the drone moves North, latitude will increase, whilst if it moves South latitude will decrease.
@@ -33,15 +42,15 @@ public class Position {
 				break;
 			
 			case NNE:
-				newPos = new Position(this.latitude + r*Math.sin(rad67_5), this.longitude + r*Math.cos(rad67_5));
+				newPos = new Position(this.latitude + sinDist67_5, this.longitude + cosDist67_5);
 				break;
 			
 			case NE:
-				newPos = new Position(this.latitude + r*Math.sin(rad45), this.longitude + r*Math.cos(rad45));
+				newPos = new Position(this.latitude + sinDist45, this.longitude + cosDist45);
 				break;
 				
 			case ENE:
-				newPos = new Position(this.latitude + r*Math.sin(rad22_5), this.longitude + r*Math.cos(rad22_5));
+				newPos = new Position(this.latitude + sinDist22_5, this.longitude + cosDist22_5);
 				break;
 				
 			case E:
@@ -49,15 +58,15 @@ public class Position {
 				break;
 				
 			case ESE:
-				newPos = new Position(this.latitude - r*Math.sin(rad22_5), this.longitude + r*Math.cos(rad22_5));
+				newPos = new Position(this.latitude - sinDist22_5, this.longitude + cosDist22_5);
 				break;
 				
 			case SE:
-				newPos = new Position(this.latitude - r*Math.sin(rad45), this.longitude + r*Math.cos(rad45));
+				newPos = new Position(this.latitude - sinDist45, this.longitude + cosDist45);
 				break;
 				
 			case SSE:
-				newPos = new Position(this.latitude - r*Math.sin(rad67_5), this.longitude + r*Math.cos(rad67_5));
+				newPos = new Position(this.latitude - sinDist67_5, this.longitude + cosDist67_5);
 				break;
 				
 			case S:
@@ -65,15 +74,15 @@ public class Position {
 				break;
 				
 			case SSW:
-				newPos = new Position(this.latitude - r*Math.sin(rad67_5), this.longitude - r*Math.cos(rad67_5));
+				newPos = new Position(this.latitude - sinDist67_5, this.longitude - cosDist67_5);
 				break;
 				
 			case SW:
-				newPos = new Position(this.latitude - r*Math.sin(rad45), this.longitude - r*Math.cos(rad45));
+				newPos = new Position(this.latitude - sinDist45, this.longitude - cosDist45);
 				break;
 				
 			case WSW:
-				newPos = new Position(this.latitude - r*Math.sin(rad22_5), this.longitude - r*Math.cos(rad22_5));
+				newPos = new Position(this.latitude - sinDist22_5, this.longitude - cosDist22_5);
 				break;
 				
 			case W:
@@ -81,15 +90,15 @@ public class Position {
 				break;
 				
 			case WNW:
-				newPos = new Position(this.latitude + r*Math.sin(rad22_5), this.longitude - r*Math.cos(rad22_5));
+				newPos = new Position(this.latitude + sinDist22_5, this.longitude - cosDist22_5);
 				break;
 				
 			case NW:
-				newPos = new Position(this.latitude + r*Math.sin(rad45), this.longitude - r*Math.cos(rad45));
+				newPos = new Position(this.latitude + sinDist45, this.longitude - cosDist45);
 				break;
 				
 			case NNW:
-				newPos = new Position(this.latitude + r*Math.sin(rad67_5), this.longitude - r*Math.cos(rad67_5));
+				newPos = new Position(this.latitude + sinDist67_5, this.longitude - cosDist67_5);
 				break;
 			
 			default:
@@ -112,4 +121,11 @@ public class Position {
 		return "[" + Double.toString(this.longitude) + "," + this.latitude + "]\n";
 	}
 	
+	public boolean equals(Object o) {
+		Position position = (Position) o;
+		
+		double uncertainty = Math.pow(10, -10);
+		return (Math.abs(this.latitude - position.latitude) < uncertainty) && (Math.abs(this.longitude - position.longitude) < uncertainty);
+		
+	}
 }

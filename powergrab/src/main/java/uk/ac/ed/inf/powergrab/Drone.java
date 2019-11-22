@@ -28,6 +28,22 @@ public abstract class Drone {
 		
 	}
 	
+	public ChargingStation findClosestStation(List<ChargingStation> stations, Position position) {
+		
+		ChargingStation result = null;
+		double minDistance = 1;
+		for (ChargingStation station: stations) {
+			double currentDistance = station.distance(position);
+			if (currentDistance <= 0.00025) { 
+				if (currentDistance < minDistance) {
+					minDistance = currentDistance;
+					result = station;
+				}
+			}
+		}
+		return result;
+	}
+	
 	public void updateCharge(ChargingStation station ) { //double powerUpdate, double coinsUpdate) {
 		
 		double updateCoins = 0;

@@ -59,7 +59,8 @@ public class App {
 //		String droneMode = args[6];
 		
 		//String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
-		String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/01/01/powergrabmap.geojson";
+		String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/06/19/powergrabmap.geojson";
+		
 		try {
 			URL mapURL = new URL(mapString);
 			HttpURLConnection conn = (HttpURLConnection) mapURL.openConnection();
@@ -74,13 +75,22 @@ public class App {
 			List<ChargingStation> StationsList = createStationList(fc);
 			
 			Position p1 = new Position(55.944425, -3.188396);
-			Drone d1 = new StatelessDrone(p1, 6789);
+			String droneMode  = "stateful";
+			Drone d1;
+			if(droneMode.equals("stateless")) {
+				d1 = new StatelessDrone(p1, 5678);
+			}
+			else {
+				d1 = new StatefulDrone(p1, 5678);
+			}
+			
 			List<Position>  path = d1.calculateMoves(StationsList);
 			
 			
 			FeatureCollection fcFinal = outputPath(path, fc); 
 			
-			System.out.print(fcFinal.toJson());
+			System.out.println(fcFinal.toJson());
+			
 			
 			
 		} catch (MalformedURLException e) {

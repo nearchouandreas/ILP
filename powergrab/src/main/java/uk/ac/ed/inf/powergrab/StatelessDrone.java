@@ -9,21 +9,7 @@ public class StatelessDrone extends Drone{
 		super(position, seed);
 	}
 	
-	public ChargingStation findClosestStation(List<ChargingStation> stations, Position position) {
-		
-		ChargingStation result = null;
-		double minDistance = 1;
-		for (ChargingStation station: stations) {
-			double currentDistance = station.distance(position);
-			if (currentDistance <= 0.00025) { 
-				if (currentDistance < minDistance) {
-					minDistance = currentDistance;
-					result = station;
-				}
-			}
-		}
-		return result;
-	}
+	
 	
 //	public ChargingStation findBestStation(List<ChargingStation> stations, Position position) {
 //		
@@ -56,27 +42,40 @@ public class StatelessDrone extends Drone{
 		}
 		
 		int noOfMoves = 0;
-		while(noOfMoves < 250 && this.getPower() > 0) {
+		while(noOfMoves < 250 && this.getPower() > 1.25) {
 			path.add(this.getPosition());
 			
 			Direction dir = Direction.N;// = Direction.dirByIndex().get(0);
 			Position nextPos = this.getPosition().nextPosition(dir);// = this.getPosition().nextPosition(dir);
 			
+			//List<ChargingStation> closeStations;
+			double bestCoins = Double.MIN_VALUE;
+			ChargingStation bestStation  = null;
+			
 			for (int i = 0; i < 16; i++) {
-				dir = Direction.dirByIndex().get(i);
+				Direction currentDir = Direction.dirByIndex().get(i);
+				Position posToMove = this.getPosition().nextPosition(currentDir);
 				
-				nextPos = this.getPosition().nextPosition(dir);
-				if (goodStations.contains(findClosestStation(stations, nextPos)) && nextPos.inPlayArea()) {
-					
-					break;				
+				ChargingStation station = findClosestStation(stations, posToMove);
+				if (station != null && posToMove.inPlayArea()) {
+					if (station.getCoins() > bestCoins) {
+						dir = currentDir;
+						bestCoins = station.getCoins();
+						nextPos = posToMove;
+						bestStation = station;
+					}
 				}
+//				if (goodStations.contains(findClosestStation(stations, nextPos)) && nextPos.inPlayArea()) {
+//					
+//					break;				
+//				}
 			}
 			
-			if (findClosestStation(goodStations, nextPos) == null) {
+			if (bestStation == null) {
 				int dirIndex = getRnd().nextInt(16);
 				dir = Direction.dirByIndex().get(dirIndex);
 				nextPos = this.getPosition().nextPosition(dir);
-				while (findClosestStation(badStations, nextPos) != null || !nextPos.inPlayArea()) {
+				while (badStations.contains(findClosestStation(stations, nextPos))|| !nextPos.inPlayArea()) {
 					//System.out.print("hello");
 					//System.out.print("Hello1");
 					dirIndex = getRnd().nextInt(16);
@@ -93,18 +92,18 @@ public class StatelessDrone extends Drone{
 			//System.out.println("->drone power before: " + this.getPower());
 			this.move(dir);
 			
-			//System.out.println(dir);
+			System.out.println(dir);
 			//System.out.println("drone power after: " + this.getPower());
 			
 			noOfMoves++;
 			//System.out.println(noOfMoves);
-			if (findClosestStation(stations, this.getPosition()) != null) {
-				ChargingStation stationInRange = findClosestStation(stations, this.getPosition());
-				//System.out.println(stationInRange.getPower());
+			ChargingStation stationInRange = findClosestStation(stations, this.getPosition());
+			if (stationInRange != null) {
+				System.out.println(stationInRange.getCoins());
 				this.updateCharge(stationInRange);
-				//System.out.println(this.getPower());
-				//System.out.println();
-				goodStations.remove(stationInRange);//findClosestStation(goodStations, nextPos));
+				System.out.println(stationInRange.getCoins() + "----");
+				System.out.println();
+				//goodStations.remove(stationInRange);//findClosestStation(goodStations, nextPos));
 				
 				
 			}
@@ -114,9 +113,9 @@ public class StatelessDrone extends Drone{
 //			}
 			
 		}
-//		System.out.println("moves: " + noOfMoves);
-		//System.out.println("coins: " + this.getCoins());
-		//System.out.println("power: " + this.getPower());
+		System.out.println("moves: " + noOfMoves);
+		System.out.println("coins: " + this.getCoins());
+		System.out.println("power: " + this.getPower());
 		return path;
 		
 	}

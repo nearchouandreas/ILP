@@ -22,9 +22,9 @@ public class ChargingStation {
 	public double distance(Position position) {
 		
 		double x1 = position.longitude;
-		double x2  = this.getCoordinates().longitude;
+		double x2  = this.coordinates.longitude;
 		double y1 = position.latitude;
-		double y2  = this.getCoordinates().latitude;
+		double y2  = this.coordinates.latitude;
 		
 		return Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)); // <= 0.0025;
 		
