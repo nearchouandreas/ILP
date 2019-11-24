@@ -54,77 +54,101 @@ public class StatefulDrone extends Drone{
 			
 			Position position = this.getPosition();
 			//path.add(position);
-			goalStation = closestGoodStation(goodStations, position);
 			
-			
-			
-			
+			//!!!!!!
 			Direction dir = Direction.N;
-			//Position newPos = position.nextPosition(dir);
-			if (goalStation != null) {
+			Position nextPos1 = this.getPosition().nextPosition(dir);// = this.getPosition().nextPosition(dir);
+			
+			//List<ChargingStation> closeStations;
+			double bestCoins = Double.MIN_VALUE;
+			ChargingStation bestStation  = null;
+			
+			for (int i = 0; i < 16; i++) {
+				Direction currentDir1 = Direction.dirByIndex().get(i);
+				Position posToMove1 = this.getPosition().nextPosition(currentDir1);
 				
-				System.out.println("Station closest: " + goalStation.getCoins());
-				double minDistance = Double.MAX_VALUE;
-				double currentDistance = goalStation.distance(position);
-				//while(findClosestStation(stations, newPos) != closestGoodStation) {
-						
-					
-				
-				//double currentDistance = closestGoodStation.distance(position);
-				int j = 0;
-				for (int i = 0; i < 16; i++) {
-					Direction currentDir = Direction.dirByIndex().get(i);
-					Position posToMove = this.getPosition().nextPosition(currentDir);
-					
-					if (posToMove.inPlayArea() &&  !badStations.contains(findClosestStation(stations, posToMove))) {
-						if (goalStation.distance(posToMove) < minDistance) {
-//							if (currentDir != dirToAvoid) { // if the direction we are looking at is nod the one we came already, then we can count it towards the result.
-//								j = i;
-//								dir = currentDir;
-//								minDistance = goalStation.distance(posToMove);
-//								position = posToMove;
-//							}
-//							else {
-//								dirToAvoid = null; //Reset the direction we need to avoid for the next step.
-//							}
-							if (!path.contains(posToMove)) { 
-								// if the direction we are looking at is nod the one we came already, then we can count it towards the result.
-								j = i;
-								dir = currentDir;
-								minDistance = goalStation.distance(posToMove);
-								position = posToMove;
-							}
-							
-						}
+				ChargingStation station = findClosestStation(stations, posToMove1);
+				if (station != null && posToMove1.inPlayArea()) {
+					if (station.getCoins() > bestCoins) {
+						dir = currentDir1;
+						bestCoins = station.getCoins();
+						nextPos1 = posToMove1;
+						bestStation = station;
 					}
 				}
-				
-				path.add(position);
-				// If the drone has moved further away from the goal station, then we mark the direction we came from
-				if (minDistance > currentDistance) {
-					int index = (j+8)%16;
-					dirToAvoid = Direction.dirByIndex().get(index);
-				}
-				//}
+			//!!!
 			}
-			
-			else {
-				
-				
-				int dirIndex = getRnd().nextInt(16);
-				dir = Direction.dirByIndex().get(dirIndex);
-				Position nextPos = this.getPosition().nextPosition(dir);
-				while (badStations.contains(findClosestStation(stations, nextPos))|| !nextPos.inPlayArea()) {
-					dirIndex = getRnd().nextInt(16);
-					dir = Direction.dirByIndex().get(dirIndex);
-					nextPos = this.getPosition().nextPosition(dir);
-				}
-				System.out.println("Wandering Around!!!");
-			}
-			
-			
-			
+			position = nextPos1;
 			//path.add(position);
+			//Position newPos = position.nextPosition(dir);
+			
+			if (bestStation == null) {
+				goalStation = closestGoodStation(goodStations, position);
+				if (goalStation != null) {
+					
+					System.out.println("Station closest: " + goalStation.getCoins());
+					double minDistance = Double.MAX_VALUE;
+					double currentDistance = goalStation.distance(position);
+					//while(findClosestStation(stations, newPos) != closestGoodStation) {
+							
+						
+					
+					//double currentDistance = closestGoodStation.distance(position);
+					int j = 0;
+					for (int i = 0; i < 16; i++) {
+						Direction currentDir = Direction.dirByIndex().get(i);
+						Position posToMove = this.getPosition().nextPosition(currentDir);
+						
+						if (posToMove.inPlayArea() &&  !badStations.contains(findClosestStation(stations, posToMove))) {
+							if (goalStation.distance(posToMove) < minDistance) {
+	//							if (currentDir != dirToAvoid) { // if the direction we are looking at is nod the one we came already, then we can count it towards the result.
+	//								j = i;
+	//								dir = currentDir;
+	//								minDistance = goalStation.distance(posToMove);
+	//								position = posToMove;
+	//							}
+	//							else {
+	//								dirToAvoid = null; //Reset the direction we need to avoid for the next step.
+	//							}
+								if (!path.contains(posToMove)) { 
+									// if the direction we are looking at is nod the one we came already, then we can count it towards the result.
+									j = i;
+									dir = currentDir;
+									minDistance = goalStation.distance(posToMove);
+									position = posToMove;
+								}
+								
+							}
+						}
+					}
+					
+					//path.add(position);
+					// If the drone has moved further away from the goal station, then we mark the direction we came from
+					if (minDistance > currentDistance) {
+						int index = (j+8)%16;
+						dirToAvoid = Direction.dirByIndex().get(index);
+					}
+					//}
+				}
+			
+				else {
+					
+					
+					int dirIndex = getRnd().nextInt(16);
+					dir = Direction.dirByIndex().get(dirIndex);
+					Position nextPos = this.getPosition().nextPosition(dir);
+					while (badStations.contains(findClosestStation(stations, nextPos))|| !nextPos.inPlayArea()) {
+						dirIndex = getRnd().nextInt(16);
+						dir = Direction.dirByIndex().get(dirIndex);
+						nextPos = this.getPosition().nextPosition(dir);
+					}
+					System.out.println("Wandering Around!!!");
+					position = nextPos;
+				}
+			}
+			
+			
+			path.add(position);
 			//System.out.println(dir);
 			this.move(dir);
 			noOfMoves++;
@@ -142,7 +166,7 @@ public class StatefulDrone extends Drone{
 				System.out.println("drone power after: " + this.getPower());
 				System.out.println(stationInRange.distance(position));
 				System.out.println();
-				if (stationInRange == goalStation) {
+				if (true) {//stationInRange == goalStation) {
 					goodStations.remove(stationInRange);
 				}
 				//System.out.println("goodStations: " + goodStations.size());
