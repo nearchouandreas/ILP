@@ -59,7 +59,7 @@ public class App {
 //		String droneMode = args[6];
 		
 		//String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
-		String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/07/05/powergrabmap.geojson";
+		String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/12/23/powergrabmap.geojson";
 		
 		try {
 			URL mapURL = new URL(mapString);
