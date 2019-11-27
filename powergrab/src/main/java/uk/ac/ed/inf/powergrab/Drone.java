@@ -123,10 +123,10 @@ public abstract class Drone {
     //Finds the best station that is in the immediate scope of the drone(can be accessed in one move)
     public ChargingStation bestStationInScope() {
 
-        //bestCoins and bestStation
+        //initialise variables
         double bestCoins = Double.MIN_VALUE;
         ChargingStation bestStation  = null;
-        
+        Direction direction = Direction.N;
         // For every direction possible, doing a clockwise rotation
         for (int i = 0; i < 16; i++) {
             
@@ -141,13 +141,14 @@ public abstract class Drone {
             if (stationInRange != null && posToMove.inPlayArea()) {
                 //and if the station's coins are better than any station's coins we have seen so far in range then store it
                 if (stationInRange.getCoins() > bestCoins) {
-                    dir = dirToMove;
+                    direction = dirToMove;
                     bestCoins = stationInRange.getCoins();
                     //nextPos = posToMove;
                     bestStation = stationInRange;
                 }
             }
         }
+        dir = direction;
         return bestStation;
     }
     

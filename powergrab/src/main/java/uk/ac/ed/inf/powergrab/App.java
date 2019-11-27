@@ -47,6 +47,47 @@ public class App {
 		return fcReturn;
 		
 	}
+	
+	public static void createOutputFiles(FeatureCollection fc, String name) {
+	    
+	    File filetxt = new File(String.format("/Users/andreas2/Documents/outILP/%s.txt", name));
+        
+        //Create the file
+        try {
+            if (filetxt.createNewFile())
+            {
+                System.out.println("Text file is created!");
+            } else {
+                System.out.println("Text file already exists.");
+            }
+            
+          //Write Content
+            FileWriter writertxt = new FileWriter(filetxt);
+            writertxt.write(fc.toJson());
+            writertxt.close();
+            
+            File filejson = new File(String.format("/Users/andreas2/Documents/outILP/%s.geojson", name));
+            
+            //Create the file
+            if (filejson.createNewFile())
+            {
+                System.out.println("GeoJson file is created!");
+            } else {
+                System.out.println("GeoJson file already exists.");
+            }
+             
+            //Write Content
+            FileWriter writerjson = new FileWriter(filejson);
+            writerjson.write(fc.toJson());
+            writerjson.close();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+         
+        
+	    
+	}
     
 	public static void main(String[] args) {
 		
@@ -58,8 +99,12 @@ public class App {
 //		int seed = Integer.parseInt(args[5]);
 //		String droneMode = args[6];
 		
-		//String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
-		String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/12/23/powergrabmap.geojson";
+	   String year = "2020";
+	   String month = "09";
+	   String day = "02";
+	   
+		String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
+		//String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/02/02/powergrabmap.geojson";
 		
 		try {
 			URL mapURL = new URL(mapString);
@@ -86,12 +131,14 @@ public class App {
 			
 			List<Position>  path = d1.calculateMoves(StationsList);
 			
-			
 			FeatureCollection fcFinal = outputPath(path, fc); 
 			
 			System.out.println(fcFinal.toJson());
 			
+			String name = String.format("%s-%s-%s-%s", droneMode, day, month, year);
 			
+			createOutputFiles(fcFinal, name);
+		
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

@@ -5,7 +5,8 @@ import java.util.*;
 public class StatefulDrone extends Drone{
 // NOTE: I changed how direction works. I have set dir as a parameter in the Drone class and it is updated there. 
 // Should we change the strategy?
-// Should we change the Lists? Maybe sets?    
+// Should we change the Lists? Maybe sets? 
+// I don't move towards the closest direction. Just move towards one direction that gets u inside the range
     
 	public StatefulDrone(Position initPosition, int seed) {
 		super(initPosition, seed);
@@ -32,7 +33,7 @@ public class StatefulDrone extends Drone{
 	public void bestDirectionToGoal(List<Position> path, ChargingStation goalStation) {
 	    
 	    double minDistance = Double.MAX_VALUE;
-        Direction direction = Direction.N;    
+        Direction direction = null;    
         
         // for every possible direction
         for (int i = 0; i < 16; i++) {
@@ -47,14 +48,31 @@ public class StatefulDrone extends Drone{
                     
                     // if the direction we are looking at is not the one we came already, then we can count it towards the result.
                     if (!path.contains(posToMove)) {
-                        direction = dirToMove;
-                        minDistance = goalStation.distance(posToMove);
+                        
+                        // if you happen to be in the range of any station
+                        if(findClosestStation(stations,posToMove) != null) {
+                            // and this station has coins
+                            if (findClosestStation(stations, posToMove).getCoins()  > 0) {
+                                direction = dirToMove;
+                                minDistance = goalStation.distance(posToMove);
+                            }
+                        }
+                        else {
+                            direction = dirToMove;
+                            minDistance = goalStation.distance(posToMove);
+                        }
                     }   
                 }
             }
         }
-        dir =  direction;
+        if (direction == null) {
+            findRandomDirection();
+        }
+        else {
+            dir =  direction;
+        }
 	}
+	
 	
 
 	// calculates the path that the drone follows
@@ -121,6 +139,20 @@ public class StatefulDrone extends Drone{
 			// if the drone is indeed in the range of a station
 			if (stationInRange != null) {
 				System.out.println("Station charging: " + stationInRange.getCoins());
+				
+				//System.out.println("Distance from station charging is: " + stationInRange.distance(this.getPosition()));
+//				for (ChargingStation station: goodStations) {
+//                    if (station.getId().equals("5af6-28ed-a405-7258-23ac-bd9b") ) {
+//                        System.out.println("Distance from THAT GOOD station is: " + station.distance(this.getPosition()));
+//                    }
+//                }
+//				for (ChargingStation station: badStations) {
+//				    if (station.getId().equals("db23-6675-3160-a172-d7cc-38d5") ) {
+//				        System.out.println("Distance from THAT BAD station is: " + station.distance(this.getPosition()));
+//				    }
+//				}
+				
+				
 				//charge from that station, whatever it's symbol is
 				this.updateCharge(stationInRange);
 				System.out.println(stationInRange.getCoins() + "----");
