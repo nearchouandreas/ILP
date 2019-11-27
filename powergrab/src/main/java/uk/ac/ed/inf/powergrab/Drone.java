@@ -14,13 +14,15 @@ public abstract class Drone {
     public List<ChargingStation> goodStations = new ArrayList<>();
     public Direction dir;
 	
+    public double sumOfGood;
+    
 	public Drone(Position initPosition, int seed) { // double initPower ,double initCoins,
 		
 		this.power = 250.0;
 		this.coins = 0.0;
 		this.position = initPosition;
 		rnd = new Random(seed);
-		
+		sumOfGood = 0;
 	}
 	
 	public void move(Direction direction) {
@@ -98,6 +100,7 @@ public abstract class Drone {
         for(ChargingStation station : stations) {
             if (station.isSafe()) {
                 goodStations.add(station);
+                sumOfGood += station.getCoins();
             }
             else{
                 badStations.add(station);
@@ -117,6 +120,7 @@ public abstract class Drone {
             direction = Direction.dirByIndex().get(dirIndex);
             nextPos = this.getPosition().nextPosition(direction);
         }
+        System.out.println("Wandering Around!!!");
         dir =  direction;
     }
 	

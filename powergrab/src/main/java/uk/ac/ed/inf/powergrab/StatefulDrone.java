@@ -4,9 +4,14 @@ import java.util.*;
 
 public class StatefulDrone extends Drone{
 // NOTE: I changed how direction works. I have set dir as a parameter in the Drone class and it is updated there. 
+// NOTE2: i added total coins of good stations to the drone.
 // Should we change the strategy?
 // Should we change the Lists? Maybe sets? 
 // I don't move towards the closest direction. Just move towards one direction that gets u inside the range
+// NOTE3: I added the avoidAsGoal list to change the goal if it gets stuck. !!!
+// NOTE4: I commented out the part where it can't go in a 0 station, so it considers 0 stations as directions.
+    
+    List <ChargingStation> avoidAsGoal = new ArrayList<>();
     
 	public StatefulDrone(Position initPosition, int seed) {
 		super(initPosition, seed);
@@ -22,8 +27,12 @@ public class StatefulDrone extends Drone{
 			
 			double dist = station.distance(position);
 			if ((dist < minDist)) {
-				minDist = dist;
-				closestGoodStation = station;
+			    
+			    if (!avoidAsGoal.contains(station)) {
+			        minDist = dist;
+	                closestGoodStation = station;
+			    }
+				
 			}	
 		}
 		 return closestGoodStation;
@@ -50,20 +59,24 @@ public class StatefulDrone extends Drone{
                     if (!path.contains(posToMove)) {
                         
                         // if you happen to be in the range of any station
-                        if(findClosestStation(stations,posToMove) != null) {
-                            // and this station has coins
-                            if (findClosestStation(stations, posToMove).getCoins()  > 0) {
-                                direction = dirToMove;
-                                minDistance = goalStation.distance(posToMove);
-                            }
-                        }
-                        else {
+//                        if(findClosestStation(stations,posToMove) != null) {
+//                            // and this station has positive coins
+//                            if (findClosestStation(stations, posToMove).getCoins()  > 0) {
+//                                direction = dirToMove;
+//                                minDistance = goalStation.distance(posToMove);
+//                            }
+//                        }
+//                        else {
                             direction = dirToMove;
                             minDistance = goalStation.distance(posToMove);
-                        }
+//                        }
                     }   
                 }
             }
+        }
+        // if the drone can only move away from the drone then move in a random direction
+        if (minDistance > goalStation.distance(this.getPosition())) {
+            avoidAsGoal.add(goalStation);
         }
         if (direction == null) {
             findRandomDirection();
@@ -103,14 +116,17 @@ public class StatefulDrone extends Drone{
 			// if no station is found in any of the 16 directions
 			if (stationInScope == null) {
 			    
+			    // find the good station that is closest to the current position
+                goalStation = nextGoodStation(goodStations, position);
+                
 			    // if there are good stations left, 
-                if (!goodStations.isEmpty()) {
+                if (goalStation != null) {
                     
-                    // find the good station that is closest to the current position
-                    goalStation = nextGoodStation(goodStations, position);
+//                    // find the good station that is closest to the current position
+//                    goalStation = nextGoodStation(goodStations, position);
 				
 				
-					System.out.println("Station closest: " + goalStation.getCoins());
+					//System.out.println("Station closest: " + goalStation.getCoins());
 					//find the direction that brings you closer and safe to that goal station
 					bestDirectionToGoal(path, goalStation);
 				}
@@ -155,6 +171,9 @@ public class StatefulDrone extends Drone{
 				
 				//charge from that station, whatever it's symbol is
 				this.updateCharge(stationInRange);
+				//if (goodStations.contains(stationInRange)) {
+				    avoidAsGoal.clear();
+				//}
 				System.out.println(stationInRange.getCoins() + "----");
 				System.out.println("drone power after: " + this.getPower());
 				System.out.println(stationInRange.distance(position));
@@ -167,6 +186,7 @@ public class StatefulDrone extends Drone{
 		}
 		System.out.println("Final power: " + this.getPower());
 		System.out.println("Final coins: " + this.getCoins());
+		System.out.println("Total coins: " + this.sumOfGood);
 		return path;
 	}
 	
