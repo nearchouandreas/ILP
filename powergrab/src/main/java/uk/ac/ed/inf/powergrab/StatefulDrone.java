@@ -111,7 +111,7 @@ public class StatefulDrone extends Drone{
 			Position position = this.getPosition();
 			
 			// Search if there is a station in immediate scope (any of the 16 directions). If there is return it, else return null
-			ChargingStation stationInScope = bestStationInScope();
+			ChargingStation stationInScope  = bestStationInScope();
 			
 			// if no station is found in any of the 16 directions
 			if (stationInScope == null) {
@@ -171,9 +171,9 @@ public class StatefulDrone extends Drone{
 				
 				//charge from that station, whatever it's symbol is
 				this.updateCharge(stationInRange);
-				//if (goodStations.contains(stationInRange)) {
+				if (stationInRange == goalStation) {//goodStations.contains(stationInRange)) {
 				    avoidAsGoal.clear();
-				//}
+				}
 				System.out.println(stationInRange.getCoins() + "----");
 				System.out.println("drone power after: " + this.getPower());
 				System.out.println(stationInRange.distance(position));
@@ -181,6 +181,10 @@ public class StatefulDrone extends Drone{
 				// if the drone charges from a good station then remove it from the list of good stations
 				goodStations.remove(stationInRange);
 				
+			}
+			
+			if (goodStations.size() <= avoidAsGoal.size())  {
+			    avoidAsGoal.clear();
 			}
 			
 		}

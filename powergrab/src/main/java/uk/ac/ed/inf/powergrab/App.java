@@ -99,9 +99,9 @@ public class App {
 //		int seed = Integer.parseInt(args[5]);
 //		String droneMode = args[6];
 		
-	   String year = "2019";
-	   String month = "11";
-	   String day = "17";
+	   String year = "2020";
+	   String month = "09";
+	   String day = "02";
 	   
 		String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
 		//String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/02/02/powergrabmap.geojson";
