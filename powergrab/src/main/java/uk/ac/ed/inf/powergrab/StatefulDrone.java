@@ -126,13 +126,14 @@ public class StatefulDrone extends Drone{
 //                    goalStation = nextGoodStation(goodStations, position);
 				
 				
-					//System.out.println("Station closest: " + goalStation.getCoins());
+					System.out.println("Station closest: " + goalStation.getCoins());
 					//find the direction that brings you closer and safe to that goal station
 					bestDirectionToGoal(path, goalStation);
 				}
 				// else just wander safely around in a random direction
 				else {
-					findRandomDirection();
+					dir = null;
+				    //findRandomDirection();
 					System.out.println("Wandering Around!!!");
 				}
 			}
@@ -142,7 +143,10 @@ public class StatefulDrone extends Drone{
 			//System.out.println(dir);
 			
 			// Move towards the best direction, add the next position to the path and increment number of moves
-			this.move(dir);
+			if (dir != null) {
+			    this.move(dir);
+			}
+			
 			path.add(this.getPosition());
 			noOfMoves++;
 			

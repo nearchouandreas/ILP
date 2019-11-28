@@ -129,8 +129,16 @@ public abstract class Drone {
 
         //initialise variables
         double bestCoins = Double.MIN_VALUE;
+        double bestNegativeCoins = -Double.MAX_VALUE;
+        
         ChargingStation bestStation  = null;
+        ChargingStation bestNegativeStation = null;
+        
         Direction direction = Direction.N;
+        Direction dirBestNegative = null;
+        
+        int noOfBad = 0;
+        
         // For every direction possible, doing a clockwise rotation
         for (int i = 0; i < 16; i++) {
             
@@ -143,17 +151,35 @@ public abstract class Drone {
             
             // If there is a station in range and the next position is in play area,
             if (stationInRange != null && posToMove.inPlayArea()) {
-                //and if the station's coins are better than any station's coins we have seen so far in range then store it
-                if (stationInRange.getCoins() > bestCoins) {
-                    direction = dirToMove;
-                    bestCoins = stationInRange.getCoins();
-                    //nextPos = posToMove;
-                    bestStation = stationInRange;
+                if (!stationInRange.isSafe()) {
+                    noOfBad++;
+                    
+                    if (stationInRange.getCoins() > bestNegativeCoins) {
+                        dirBestNegative = dirToMove;
+                        bestNegativeCoins = stationInRange.getCoins();
+                        bestNegativeStation = stationInRange;
+                    } 
+                }
+                else {
+                  //and if the station's coins are better than any station's coins we have seen so far in range then store it
+                    if (stationInRange.getCoins() > bestCoins) {
+                        direction = dirToMove;
+                        bestCoins = stationInRange.getCoins();
+                        bestStation = stationInRange;
+                    }
+                    
                 }
             }
         }
-        dir = direction;
-        return bestStation;
+        if (noOfBad == 16) {
+            dir = dirBestNegative;
+            return bestNegativeStation;
+        }
+        else {
+            dir = direction;
+            return bestStation;
+        }
+        
     }
     
 	// abstract method, producing the path, that is implemented separately in the two children classes

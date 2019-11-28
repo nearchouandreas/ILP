@@ -52,7 +52,7 @@ public class App {
 	    
 	    File filetxt = new File(String.format("/Users/andreas2/Documents/outILP/%s.txt", name));
         
-        //Create the file
+        //Create the text file
         try {
             if (filetxt.createNewFile())
             {
@@ -68,7 +68,7 @@ public class App {
             
             File filejson = new File(String.format("/Users/andreas2/Documents/outILP/%s.geojson", name));
             
-            //Create the file
+            //Create the Json file
             if (filejson.createNewFile())
             {
                 System.out.println("GeoJson file is created!");
@@ -119,7 +119,7 @@ public class App {
 //			System.out.println(fc.features());
 			List<ChargingStation> StationsList = createStationList(fc);
 			
-			Position p1 = new Position(55.944425, -3.188396);
+			Position p1 = new Position(55.9452,-3.1845);//55.944425, -3.188396);
 			String droneMode  = "stateful";
 			Drone d1;
 			if(droneMode.equals("stateless")) {
