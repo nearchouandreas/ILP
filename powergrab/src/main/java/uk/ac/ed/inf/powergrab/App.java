@@ -6,13 +6,14 @@ import org.apache.commons.io.IOUtils;
 import com.mapbox.geojson.*;
 import java.util.*;
 import com.google.gson.*;
+import java.time.*;
 
 public class App {
 	
-	public static ArrayList<ChargingStation> createStationList(FeatureCollection fc){ // new class
+    // Creates a list of stations out of the feature collection.
+	public static ArrayList<ChargingStation> createStationList(FeatureCollection fc){ 
 		
 		ArrayList<ChargingStation> stations = new ArrayList<ChargingStation>();
-		//List<ChargingStation> stations = new ArrayList<Position, ChargingStation>();
 		for (Feature f : fc.features()) {
 			String id = f.getProperty("id").getAsString();
 			double coins = f.getProperty("coins").getAsDouble(); 
@@ -29,6 +30,7 @@ public class App {
 		return stations;
 	}
 	
+	// Adds the path into the initial feature collection, as a line string.
 	public static FeatureCollection outputPath(List<Position> path, FeatureCollection fc) {
 		
 		List<Point> pointsList = new ArrayList<Point>();
@@ -48,7 +50,8 @@ public class App {
 		
 	}
 	
-	public static void createOutputFiles(FeatureCollection fc, String name) {
+	// Creates and outputs the files required.
+	public static void createOutputFiles(FeatureCollection fc, String allMoves, String name) {
 	    
 	    File filetxt = new File(String.format("/Users/andreas2/Documents/outILP/%s.txt", name));
         
@@ -63,7 +66,7 @@ public class App {
             
           //Write Content
             FileWriter writertxt = new FileWriter(filetxt);
-            writertxt.write(fc.toJson());
+            writertxt.write(allMoves);
             writertxt.close();
             
             File filejson = new File(String.format("/Users/andreas2/Documents/outILP/%s.geojson", name));
@@ -84,12 +87,76 @@ public class App {
         } catch (IOException e) {
             e.printStackTrace();
         }
-         
-        
-	    
+             
 	}
+	
+	// Retrieves the map from the URL provided and returns it as a feature collection.
+	private static FeatureCollection parseMap(String mapString) {
+        
+	    URL mapURL;
+        try {
+            mapURL = new URL(mapString);
+            HttpURLConnection conn = (HttpURLConnection) mapURL.openConnection();
+            
+            InputStream inputStream = conn.getInputStream(); 
+            StringWriter writer = new StringWriter();
+            IOUtils.copy(inputStream, writer, "UTF-8"); //CHECK IF ADDING DEPENDENY IS ALLOWED!! APACHE!!
+            String mapSource = writer.toString();
+            
+            FeatureCollection fc = FeatureCollection.fromJson(mapSource);
+            
+            return fc;
+            
+        } catch (MalformedURLException e) {
+          //e.printStackTrace();
+            System.out.println("URL not well formed");
+        } catch (IOException e) {
+          //e.printStackTrace();
+            System.out.println("Invalid Input");
+        }
+        return null;
+    }
     
-	public static void main(String[] args) {
+	
+    private static void playGame(String mapString, Drone drone, String name) {
+        
+        
+        FeatureCollection fc = parseMap(mapString);
+        
+        // id the feature collection returned is not null, 
+        if (fc != null) {
+            
+            // create a list of stations from the feature collection
+            List<ChargingStation> listOfStations = createStationList(fc);
+            
+            // Call the function calculate moves to output the drone's path
+            List<Position>  path = drone.calculateMoves(listOfStations);
+            
+            // Remove the final new line character in the string containing the details of each move
+            String allMoves = drone.detailedMoves.trim();
+//          for (int i = 0; i < path.size() - 2; i++) {
+//              allMoves += String.format("%s,%s,%s,%s,%s,%f,%f\n", path.get(i).latitude, path.get(i).longitude, drone.directionHistory.get(i), path.get(i+1).latitude, path.get(i+1).longitude, drone.coinsHistory.get(i), drone.powerHistory.get(i));
+//          }
+//          int n = path.size() - 2;
+//           allMoves += String.format("%s,%s,%s,%s,%s,%f,%f\n", path.get(n).latitude, path.get(n).longitude, drone.directionHistory.get(n), path.get(n+1).latitude, path.get(n+1).longitude, drone.coinsHistory.get(n), drone.powerHistory.get(n));
+            
+            // add the path to the initial feature collection
+            FeatureCollection fcFinal = outputPath(path, fc); 
+            
+            System.out.println(fcFinal.toJson());
+           
+            // Create the output files
+            createOutputFiles(fcFinal, allMoves, name);
+        }
+        else {
+            return;
+        }
+        
+    }
+    
+	
+
+    public static void main(String[] args) {
 		
 //		String day = args[0];
 //		String month = args[1];
@@ -98,54 +165,55 @@ public class App {
 //		double longitude = Double.parseDouble(args[4]);
 //		int seed = Integer.parseInt(args[5]);
 //		String droneMode = args[6];
-		
-	   String year = "2020";
-	   String month = "09";
-	   String day = "02";
+
+	    String year = "2020";
+        String month = "02";
+        String day = "29";
+        
+        // Check if the date is valid and well formatted.
+        try {
+            LocalDate date  = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
+        } catch (DateTimeException e){
+            System.out.println("Invalid date entered.");
+            return;
+        }
+        
+        // Create the string that is going to be used as the URL to retrieve the map.
+        String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
+        //String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/02/02/powergrabmap.geojson";
+        
+        // Check if the initial position is within the play area.
+        Position p1 = new Position(55.944425, -3.188396);
+        if (!p1.inPlayArea()) {
+            System.out.println("Initial position is out of bounds.");
+            return;
+        }
+        
+        // Create a drone depending on the drone mode and seed entered. If the drone mode is neither 'stateless' of 'stateful', then output an error message.
+        String droneMode  = "stateful";
+        Drone drone;
+        if(droneMode.equals("stateless")) {
+            drone = new StatelessDrone(p1, 5678);
+        }
+        else if (droneMode.equals("stateful")){
+            drone = new StatefulDrone(p1, 5678);
+        }
+        else {
+            System.out.println("Invalid drone mode. Drone mode is either 'stateless' or 'statefull'.");
+            return;
+        }
+        
+	    double startTime = System.nanoTime();
+	    
+	    // Create the name of the game that is going to be used for the two output files.
+	    String gameName = String.format("%s-%s-%s-%s", droneMode, day, month, year);
+	    
+	    
+	    playGame(mapString, drone, gameName);
 	   
-		String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
-		//String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/02/02/powergrabmap.geojson";
-		
-		try {
-			URL mapURL = new URL(mapString);
-			HttpURLConnection conn = (HttpURLConnection) mapURL.openConnection();
-			
-			InputStream inputStream = conn.getInputStream(); // newclass
-			StringWriter writer = new StringWriter();
-			IOUtils.copy(inputStream, writer, "UTF-8"); //CHECK IF ADDING DEPENDENY IS ALLOWED!! APACHE!!
-			String mapSource = writer.toString();
-			
-			FeatureCollection fc = FeatureCollection.fromJson(mapSource);
-//			System.out.println(fc.features());
-			List<ChargingStation> StationsList = createStationList(fc);
-			
-			Position p1 = new Position(55.9452,-3.1845);//55.944425, -3.188396);
-			String droneMode  = "stateful";
-			Drone d1;
-			if(droneMode.equals("stateless")) {
-				d1 = new StatelessDrone(p1, 5678);
-			}
-			else {
-				d1 = new StatefulDrone(p1, 5678);
-			}
-			
-			List<Position>  path = d1.calculateMoves(StationsList);
-			
-			FeatureCollection fcFinal = outputPath(path, fc); 
-			
-			System.out.println(fcFinal.toJson());
-			
-			String name = String.format("%s-%s-%s-%s", droneMode, day, month, year);
-			
-			createOutputFiles(fcFinal, name);
-		
-			
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
+		double duration = System.nanoTime() - startTime;
+		System.out.println(duration/1000000000);
+
+    }	
 	
 }

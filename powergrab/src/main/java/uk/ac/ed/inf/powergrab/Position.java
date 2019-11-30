@@ -22,13 +22,6 @@ public class Position {
 	public Position nextPosition(Direction direction) {
 		
 		Position newPos;
-		//final double r = 0.0003; // The drone always travels this distance r
-		
-		// Converting 65.5, 45 and 22.5 degrees to radians in order to use sine and cosine functions later.
-//		double rad67_5 = Math.toRadians(67.5); 
-//		double rad45 = Math.toRadians(45);
-//		double rad22_5 = Math.toRadians(22.5);
-		
 		
 		// If the drone moves North, latitude will increase, whilst if it moves South latitude will decrease.
 		// If the drone moves East, longitude will increase, whilst if it moves West longitude will decrease.

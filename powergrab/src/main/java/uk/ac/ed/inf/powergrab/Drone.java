@@ -7,12 +7,17 @@ public abstract class Drone {
 	private double power;
 	private double coins;
 	private Position position;
-	private Random rnd;
 	
-	public List<ChargingStation> stations = new ArrayList<>();
-    public List<ChargingStation> badStations = new ArrayList<>();
-    public List<ChargingStation> goodStations = new ArrayList<>();
-    public Direction dir;
+	protected String detailedMoves = "";
+	protected List<Double> coinsHistory = new ArrayList<Double>();
+	protected List<Double> powerHistory = new ArrayList<Double>();
+	protected List<Direction> directionHistory = new ArrayList<Direction>();
+
+	protected Random rnd;
+	protected List<ChargingStation> stations = new ArrayList<>();
+    protected List<ChargingStation> badStations = new ArrayList<>();
+    protected List<ChargingStation> goodStations = new ArrayList<>();
+    protected Direction dir;
 	
     public double sumOfGood;
     
@@ -25,7 +30,7 @@ public abstract class Drone {
 		sumOfGood = 0;
 	}
 	
-	public void move(Direction direction) {
+	protected void move(Direction direction) {
 		 
 		Position newPos = this.position.nextPosition(direction);
 		this.position = newPos;
@@ -36,7 +41,7 @@ public abstract class Drone {
 	
 	
 	// Returns the closest station in range, if there is one, or null otherwise.
-	public ChargingStation findClosestStation(List<ChargingStation> stations, Position position) {
+	protected ChargingStation findClosestStation(List<ChargingStation> stations, Position position) {
 		
 		ChargingStation result = null;
 		double minDistance = 1;
@@ -53,7 +58,7 @@ public abstract class Drone {
 	}
 	
 	// Updates the charge of a station and the drone, when the drone is within range of that station
-	public void updateCharge(ChargingStation station ) { //double powerUpdate, double coinsUpdate) {
+	protected void updateCharge(ChargingStation station ) { //double powerUpdate, double coinsUpdate) {
 		
 		double updateCoins = 0;
 		double updatePower = 0;
@@ -95,7 +100,7 @@ public abstract class Drone {
 	}
 	
 	// Separate good and bad stations
-    public void separateStations(List<ChargingStation> stations) {
+    protected void separateStations(List<ChargingStation> stations) {
         
         for(ChargingStation station : stations) {
             if (station.isSafe()) {
@@ -110,12 +115,12 @@ public abstract class Drone {
     }
     
     // Generates a random direction
-    public void findRandomDirection() {
+    protected void findRandomDirection() {
         
         int dirIndex = getRnd().nextInt(16);
         Direction direction = Direction.dirByIndex().get(dirIndex);
         Position nextPos = this.getPosition().nextPosition(direction);
-        while (badStations.contains(findClosestStation(stations, nextPos))|| !nextPos.inPlayArea()) {
+        while (badStations.contains(findClosestStation(stations, nextPos)) || !nextPos.inPlayArea()) {
             dirIndex = getRnd().nextInt(16);
             direction = Direction.dirByIndex().get(dirIndex);
             nextPos = this.getPosition().nextPosition(direction);
@@ -125,9 +130,10 @@ public abstract class Drone {
     }
 	
     //Finds the best station that is in the immediate scope of the drone(can be accessed in one move)
-    public ChargingStation bestStationInScope() {
+    protected ChargingStation bestStationInScope() {
 
         //initialise variables
+        // Store two sets of variables, one set is in case every station in immediate scope is bad
         double bestCoins = Double.MIN_VALUE;
         double bestNegativeCoins = -Double.MAX_VALUE;
         
@@ -137,41 +143,54 @@ public abstract class Drone {
         Direction direction = Direction.N;
         Direction dirBestNegative = null;
         
-        int noOfBad = 0;
+        boolean allBad = true;
         
         // For every direction possible, doing a clockwise rotation
         for (int i = 0; i < 16; i++) {
+            
             
             // Find the possible direction and next Position
             Direction dirToMove = Direction.dirByIndex().get(i);
             Position posToMove = this.getPosition().nextPosition(dirToMove);
             
-            // Check if there is a station in range of the position considered
-            ChargingStation stationInRange = findClosestStation(stations, posToMove);
+            
             
             // If there is a station in range and the next position is in play area,
-            if (stationInRange != null && posToMove.inPlayArea()) {
-                if (!stationInRange.isSafe()) {
-                    noOfBad++;
-                    
-                    if (stationInRange.getCoins() > bestNegativeCoins) {
-                        dirBestNegative = dirToMove;
-                        bestNegativeCoins = stationInRange.getCoins();
-                        bestNegativeStation = stationInRange;
-                    } 
-                }
-                else {
-                  //and if the station's coins are better than any station's coins we have seen so far in range then store it
-                    if (stationInRange.getCoins() > bestCoins) {
-                        direction = dirToMove;
-                        bestCoins = stationInRange.getCoins();
-                        bestStation = stationInRange;
+            if (posToMove.inPlayArea()) {
+                
+             // Check if there is a station in range of the position considered
+                ChargingStation stationInRange = findClosestStation(stations, posToMove);
+                
+                boolean isCurrentBad = false;
+                
+                if (stationInRange != null) {
+                    // if station is dangerous
+                    if (!stationInRange.isSafe()) {
+                        isCurrentBad = true;
+                        // and its coins are better than any negative station's coins we have seen so far, store its details.
+                        if (stationInRange.getCoins() > bestNegativeCoins) {
+                            dirBestNegative = dirToMove;
+                            bestNegativeCoins = stationInRange.getCoins();
+                            bestNegativeStation = stationInRange;
+                        } 
                     }
-                    
+                    // else, if the station is safe
+                    else {
+                      //and if the station's coins are better than any positive station's coins we have seen so far in range then store it
+                        if (stationInRange.getCoins() > bestCoins) {
+                            direction = dirToMove;
+                            bestCoins = stationInRange.getCoins();
+                            bestStation = stationInRange;
+                        }
+                        
+                    }
                 }
+                allBad = allBad && isCurrentBad;
             }
+            
         }
-        if (noOfBad == 16) {
+        // if there are 16 bad stations, go towards the best one.
+        if (allBad) {//noOfBad == 16) {
             dir = dirBestNegative;
             return bestNegativeStation;
         }
@@ -183,7 +202,7 @@ public abstract class Drone {
     }
     
 	// abstract method, producing the path, that is implemented separately in the two children classes
-	abstract List<Position> calculateMoves(List<ChargingStation> stations);
+	protected abstract List<Position> calculateMoves(List<ChargingStation> stations);
 	
 	public double getPower() {
 		return power;

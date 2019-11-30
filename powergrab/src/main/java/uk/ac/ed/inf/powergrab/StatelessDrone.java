@@ -9,12 +9,12 @@ public class StatelessDrone extends Drone{
 		super(position, seed);
 	}
 	
-	//Function that calculates he path
-	public List<Position> calculateMoves( List<ChargingStation> stations) {
+	//Function that calculates the path
+	protected List<Position> calculateMoves( List<ChargingStation> stations) {
 		
 		List<Position> path = new ArrayList<>();
-		
 		this.stations = stations;
+		
         // separate stations into good and bad and store them in two separate lists
         separateStations(stations);
 		
@@ -23,7 +23,7 @@ public class StatelessDrone extends Drone{
 		//Game ends if number of moves is 250 of drone runs out of power
 		while(noOfMoves < 250 && this.getPower() >= 1.25) {
 			
-			
+		    // Search if there is a station in immediate scope (any of the 16 directions). If there is return it, else return null
 		    ChargingStation stationInScope = bestStationInScope();
 			
 			// if there is no station in range, find a random direction to move to
@@ -47,9 +47,14 @@ public class StatelessDrone extends Drone{
 				this.updateCharge(stationInRange);
 				System.out.println(stationInRange.getCoins() + "----");
 				System.out.println();
-				
-				
+					
 			}
+			
+			// Create the current line of the text file.
+			detailedMoves += String.format("%s,%s,%s,%s,%s,%f,%f\n", path.get(noOfMoves-1).latitude, path.get(noOfMoves-1).longitude, dir, path.get(noOfMoves).latitude, path.get(noOfMoves).longitude, this.getCoins(), this.getPower());
+//        		coinsHistory.add(this.getCoins());
+//        		powerHistory.add(this.getPower());
+//        		directionHistory.add(dir);
 			
 		}
 		System.out.println("moves: " + noOfMoves);
