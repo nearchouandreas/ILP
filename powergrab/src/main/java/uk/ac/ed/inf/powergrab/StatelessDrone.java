@@ -10,13 +10,13 @@ public class StatelessDrone extends Drone{
 	}
 	
 	//Function that calculates the path
-	protected List<Position> calculateMoves( List<ChargingStation> stations) {
+	protected List<Position> calculateMoves(Map map) {
 		
 		List<Position> path = new ArrayList<>();
-		this.stations = stations;
-		
+		//this.stations = stations;
+		this.map = map;
         // separate stations into good and bad and store them in two separate lists
-        separateStations(stations);
+        //map.separateStations(map.stations);
 		
 		int noOfMoves = 0;
 		path.add(this.getPosition());
@@ -41,7 +41,7 @@ public class StatelessDrone extends Drone{
 			
 			noOfMoves++;
 			//System.out.println(noOfMoves);
-			ChargingStation stationInRange = findClosestStation(stations, this.getPosition());
+			ChargingStation stationInRange = findClosestStation(map.stations, this.getPosition());
 			if (stationInRange != null) {
 				System.out.println(stationInRange.getCoins() + "before");
 				this.updateCharge(stationInRange);

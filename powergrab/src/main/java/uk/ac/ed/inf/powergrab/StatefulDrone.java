@@ -51,7 +51,7 @@ public class StatefulDrone extends Drone{
             Position posToMove = this.getPosition().nextPosition(dirToMove);
             
             // if the considered position is in the play area and it is not in range of a bad station
-            if (posToMove.inPlayArea() &&  !badStations.contains(findClosestStation(stations, posToMove))) {
+            if (posToMove.inPlayArea() &&  !map.badStations.contains(findClosestStation(map.stations, posToMove))) {
                 
                 // Store the minimum distance to the goal over all directions
                 if (goalStation.distance(posToMove) < minDistance) {
@@ -81,13 +81,14 @@ public class StatefulDrone extends Drone{
 	
 
 	// calculates the path that the drone follows
-	protected List<Position> calculateMoves(List<ChargingStation> stations) {
+	protected List<Position> calculateMoves(Map map) {
 		
 		List<Position> path = new ArrayList<>();
-		this.stations = stations;
 		
+		//this.stations = stations;
+		this.map = map;
 		// separate stations into good and bad and store them in two separate lists
-		separateStations(stations);
+		//map.separateStations(map.stations);
 		
 		ChargingStation goalStation = null;
 		int noOfMoves = 0;
@@ -108,7 +109,7 @@ public class StatefulDrone extends Drone{
 			if (stationInScope == null) {
 			    
 			    // find the good station that is closest to the current position
-                goalStation = nextGoodStation(goodStations, position);
+                goalStation = nextGoodStation(map.goodStations, position);
                 
 			    // if you can find a good station to use as a goal station, 
                 if (goalStation != null) {
@@ -138,7 +139,7 @@ public class StatefulDrone extends Drone{
 			System.out.println(noOfMoves);
 			
 			//Check if the drone happens to be in the range of any station
-			ChargingStation stationInRange = findClosestStation(stations, this.getPosition());
+			ChargingStation stationInRange = findClosestStation(map.stations, this.getPosition());
 			
 			// if the drone is indeed in the range of a station
 			if (stationInRange != null) {
@@ -154,13 +155,13 @@ public class StatefulDrone extends Drone{
 				System.out.println(stationInRange.distance(position));
 				System.out.println();
 				// if the drone charges from a good station then remove it from the list of good stations
-				goodStations.remove(stationInRange);
+				map.goodStations.remove(stationInRange);
 				
 			}
 			
 			// There might be times that the drone charges from stations it found in it's scope and thus the avoidAsGoal list might not be cleared;
 			// thus if it ever reaches the size of the goodStations list, clear it.
-			if (goodStations.size() <= avoidAsGoal.size())  {
+			if (map.goodStations.size() <= avoidAsGoal.size())  {
 			    avoidAsGoal.clear();
 			}
 			
@@ -173,7 +174,7 @@ public class StatefulDrone extends Drone{
 		}
 		System.out.println("Final power: " + this.getPower());
 		System.out.println("Final coins: " + this.getCoins());
-		System.out.println("Total coins: " + this.sumOfGood);
+		System.out.println("Total coins: " + map.sumOfGood);
 		return path;
 	}
 	

@@ -16,8 +16,8 @@ public class App {
 		ArrayList<ChargingStation> stations = new ArrayList<ChargingStation>();
 		for (Feature f : fc.features()) {
 			String id = f.getProperty("id").getAsString();
-			double coins = f.getProperty("coins").getAsDouble(); 
-			double power = f.getProperty("power").getAsDouble();
+			float coins = f.getProperty("coins").getAsFloat(); 
+			float power = f.getProperty("power").getAsFloat();
 			String markerSymbol = f.getProperty("marker-symbol").getAsString();
 			if (f.geometry().type().equals("Point")) {
 				List<Double> listCoordinates = ((Point)f.geometry()).coordinates();
@@ -51,7 +51,7 @@ public class App {
 	}
 	
 	// Creates and outputs the files required.
-	public static void createOutputFiles(FeatureCollection fc, String allMoves, String name) {
+	public static void createOutputFiles(FeatureCollection fc, String detailedMoves, String name) {
 	    
 	    File filetxt = new File(String.format("/Users/andreas2/Documents/outILP/%s.txt", name));
         
@@ -66,7 +66,7 @@ public class App {
             
           //Write Content
             FileWriter writertxt = new FileWriter(filetxt);
-            writertxt.write(allMoves);
+            writertxt.write(detailedMoves);
             writertxt.close();
             
             File filejson = new File(String.format("/Users/andreas2/Documents/outILP/%s.geojson", name));
@@ -128,9 +128,9 @@ public class App {
             
             // create a list of stations from the feature collection
             List<ChargingStation> listOfStations = createStationList(fc);
-            
+            Map map = new Map(listOfStations);
             // Call the function calculate moves to output the drone's path
-            List<Position>  path = drone.calculateMoves(listOfStations);
+            List<Position>  path = drone.calculateMoves(map);
             
             // Remove the final new line character in the string containing the details of each move
             String allMoves = drone.detailedMoves.trim();
@@ -166,9 +166,9 @@ public class App {
 //		int seed = Integer.parseInt(args[5]);
 //		String droneMode = args[6];
 
-	    String year = "2020";
-        String month = "02";
-        String day = "29";
+	    String year = "2019";
+        String month = "11";
+        String day = "17";
         
         // Check if the date is valid and well formatted.
         try {

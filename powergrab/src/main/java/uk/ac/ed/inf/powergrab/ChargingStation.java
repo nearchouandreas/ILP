@@ -1,15 +1,14 @@
 package uk.ac.ed.inf.powergrab;
-import java.util.*;
 
 public class ChargingStation {
 	
 	private String id;
-	private double coins;
-	private double power;
+	private float coins;
+	private float power;
 	private boolean safe;
 	private Position coordinates;
 	
-	public ChargingStation (String id, double coins, double power, String markerSymbol, Position coordinates ) {
+	public ChargingStation (String id, float coins, float power, String markerSymbol, Position coordinates ) {
 		
 		this.id = id;
 		this.coins = coins;
@@ -30,7 +29,7 @@ public class ChargingStation {
 		
 	}
 	
-	public void updateValues(double coins, double power) {
+	public void updateValues(float coins, float power) {
 		
 		this.coins = coins;
 		this.power = power;
@@ -41,11 +40,11 @@ public class ChargingStation {
 		return id;
 	}
 
-	public double getCoins() {
+	public float getCoins() {
 		return coins;
 	}
 
-	public double getPower() {
+	public float getPower() {
 		return power;
 	}
 
@@ -53,7 +52,7 @@ public class ChargingStation {
 		return safe;
 	}
 
-	public Position getCoordinates() {
+	public Position getStationCoordinates() {
 		return coordinates;
 	}
 
