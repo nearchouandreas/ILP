@@ -6,7 +6,9 @@ public enum Direction { // We enumerate all directions, so they can be used late
 	
 	N, NNE, NE,	ENE, E,	ESE, SE, SSE, S, SSW, SW, WSW, W, WNW, NW, NNW;
 	
-	public static HashMap<Integer, Direction> dirByIndex(){
+    public static HashMap<Integer, Direction> directions = new HashMap<>();
+    
+	public static void dirByIndex(){
 		HashMap<Integer, Direction> dirs = new HashMap<>();
 		dirs.put(0, N);
 		dirs.put(1, NNE);
@@ -24,7 +26,7 @@ public enum Direction { // We enumerate all directions, so they can be used late
 		dirs.put(13, WNW);
 		dirs.put(14, NW);
 		dirs.put(15, NNW);
-		return dirs;
+		directions = dirs;
 	}
 	
 }

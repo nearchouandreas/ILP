@@ -48,7 +48,7 @@ public class StatefulDrone extends Drone{
       
         // for every possible direction
         for (int i = 0; i < 16; i++) {
-            Direction dirToMove = Direction.dirByIndex().get(i);
+            Direction dirToMove = Direction.directions.get(i);//.dirByIndex().get(i);
             Position posToMove = this.getPosition().nextPosition(dirToMove);
             
             // if the considered position is in the play area and it is not in range of a bad station

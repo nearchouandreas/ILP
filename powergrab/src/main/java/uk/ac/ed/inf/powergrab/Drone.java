@@ -24,6 +24,7 @@ public abstract class Drone {
 		this.coins = 0.0f;
 		this.position = initPosition;
 		rnd = new Random(seed);
+		Direction.dirByIndex();
 
 	}
 	
@@ -101,11 +102,11 @@ public abstract class Drone {
     protected void findRandomDirection() {
         
         int dirIndex = this.rnd.nextInt(16);
-        Direction direction = Direction.dirByIndex().get(dirIndex);
+        Direction direction = Direction.directions.get(dirIndex);//.dirByIndex().get(dirIndex);
         Position nextPos = this.getPosition().nextPosition(direction);
         while (map.badStations.contains(findClosestStation(map.stations, nextPos)) || !nextPos.inPlayArea()) {
             dirIndex = this.rnd.nextInt(16);
-            direction = Direction.dirByIndex().get(dirIndex);
+            direction = Direction.directions.get(dirIndex);//.dirByIndex().get(dirIndex);
             nextPos = this.getPosition().nextPosition(direction);
         }
         System.out.println("Wandering Around!!!");
@@ -133,7 +134,7 @@ public abstract class Drone {
             
             
             // Find the possible direction and next Position
-            Direction dirToMove = Direction.dirByIndex().get(i);
+            Direction dirToMove = Direction.directions.get(i);//dirByIndex().get(i);
             Position posToMove = this.getPosition().nextPosition(dirToMove);
             
             
