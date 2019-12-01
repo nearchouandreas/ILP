@@ -158,17 +158,17 @@ public class App {
 
     public static void main(String[] args) {
 		
-//		String day = args[0];
-//		String month = args[1];
-//		String year = args[2];
-//		double latitude = Double.parseDouble(args[3]);
-//		double longitude = Double.parseDouble(args[4]);
-//		int seed = Integer.parseInt(args[5]);
-//		String droneMode = args[6];
+		String day = args[0];
+		String month = args[1];
+		String year = args[2];
+		double latitude = Double.parseDouble(args[3]);
+		double longitude = Double.parseDouble(args[4]);
+		int seed = Integer.parseInt(args[5]);
+		String droneMode = args[6];
 
-	    String year = "2019";
-        String month = "11";
-        String day = "17";
+//	    String year = "2019";
+//        String month = "12";
+//        String day = "14";
         
         // Check if the date is valid and well formatted.
         try {
@@ -183,20 +183,20 @@ public class App {
         //String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/02/02/powergrabmap.geojson";
         
         // Check if the initial position is within the play area.
-        Position p1 = new Position(55.944425, -3.188396);
+        Position p1 = new Position(latitude, longitude);//55.944425, -3.188396);
         if (!p1.inPlayArea()) {
             System.out.println("Initial position is out of bounds.");
             return;
         }
         
         // Create a drone depending on the drone mode and seed entered. If the drone mode is neither 'stateless' of 'stateful', then output an error message.
-        String droneMode  = "stateful";
+        //String droneMode  = "stateful";
         Drone drone;
         if(droneMode.equals("stateless")) {
-            drone = new StatelessDrone(p1, 5678);
+            drone = new StatelessDrone(p1, seed);
         }
         else if (droneMode.equals("stateful")){
-            drone = new StatefulDrone(p1, 5678);
+            drone = new StatefulDrone(p1, seed);
         }
         else {
             System.out.println("Invalid drone mode. Drone mode is either 'stateless' or 'statefull'.");

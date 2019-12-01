@@ -33,7 +33,6 @@ public abstract class Drone {
 		this.position = newPos;
 		this.power -= 1.25;
 		
-		
 	}
 	
 	
@@ -101,11 +100,11 @@ public abstract class Drone {
     // Generates a random direction
     protected void findRandomDirection() {
         
-        int dirIndex = getRnd().nextInt(16);
+        int dirIndex = this.rnd.nextInt(16);
         Direction direction = Direction.dirByIndex().get(dirIndex);
         Position nextPos = this.getPosition().nextPosition(direction);
         while (map.badStations.contains(findClosestStation(map.stations, nextPos)) || !nextPos.inPlayArea()) {
-            dirIndex = getRnd().nextInt(16);
+            dirIndex = this.rnd.nextInt(16);
             direction = Direction.dirByIndex().get(dirIndex);
             nextPos = this.getPosition().nextPosition(direction);
         }
@@ -124,7 +123,7 @@ public abstract class Drone {
         ChargingStation bestStation  = null;
         ChargingStation bestNegativeStation = null;
         
-        Direction direction = Direction.N;
+        Direction direction = null;
         Direction dirBestNegative = null;
         
         boolean allBad = true;
@@ -198,9 +197,9 @@ public abstract class Drone {
 		return this.position;
 	}
 	
-	public Random getRnd() {
-		return rnd;
-	}
+//	public Random getRnd() {
+//		return rnd;
+//	}
 	
 
 }

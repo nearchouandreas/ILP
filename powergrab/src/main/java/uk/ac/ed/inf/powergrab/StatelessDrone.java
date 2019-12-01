@@ -41,7 +41,16 @@ public class StatelessDrone extends Drone{
 			
 			noOfMoves++;
 			//System.out.println(noOfMoves);
-			ChargingStation stationInRange = findClosestStation(map.stations, this.getPosition());
+			
+			ChargingStation stationInRange = null;
+            // if the drone has moved towards a station in any of the 16 directions charge from that station
+            if (stationInScope != null) {
+                stationInRange = stationInScope;
+            }
+            else {
+                //Check if the drone happens to be in the range of any station
+                stationInRange = findClosestStation(map.stations, this.getPosition());
+            }
 			if (stationInRange != null) {
 				System.out.println(stationInRange.getCoins() + "before");
 				this.updateCharge(stationInRange);

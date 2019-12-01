@@ -12,14 +12,15 @@ public class StatefulDrone extends Drone{
 // NOTE4: I commented out the part where it can't go in a 0 station, so it considers 0 stations as directions.
 // NOTE5: Remove the part that neglects the random movement.
     
-    List <ChargingStation> avoidAsGoal = new ArrayList<>();
+    private List <ChargingStation> avoidAsGoal;
     
 	public StatefulDrone(Position initPosition, int seed) {
 		super(initPosition, seed);
+		this.avoidAsGoal = new ArrayList<>();
 	}
 	
 	// Function that finds the next closest good station that is going to be used as a goal station
-	protected ChargingStation nextGoodStation(List<ChargingStation> stations, Position position) {
+	private ChargingStation nextGoodStation(List<ChargingStation> stations, Position position) {
 		
 		double minDist = Double.MAX_VALUE;
 		ChargingStation closestGoodStation = null;
@@ -29,18 +30,18 @@ public class StatefulDrone extends Drone{
 			double dist = station.distance(position);
 			if ((dist < minDist)) {
 			    
-			    if (!avoidAsGoal.contains(station)) {
+			    if (!this.avoidAsGoal.contains(station)) {
 			        minDist = dist;
 	                closestGoodStation = station;
 			    }
 				
 			}	
 		}
-		 return closestGoodStation;
+		return closestGoodStation;
 	}
 	
 	// Finds the best direction to move towards the goal station(finds which direction brings you closer safely)
-	protected void bestDirectionToGoal(List<Position> path, ChargingStation goalStation) {
+	private void bestDirectionToGoal(List<Position> path, ChargingStation goalStation) {
 	    
 	    double minDistance = Double.MAX_VALUE;
         Direction direction = null;    
@@ -66,7 +67,7 @@ public class StatefulDrone extends Drone{
         }
         // if the drone can only move away from the drone then move in a random direction
         if (minDistance > goalStation.distance(this.getPosition())) {
-            avoidAsGoal.add(goalStation);
+            this.avoidAsGoal.add(goalStation);
         }
         // If none of the 16 directions is suitable to move, then move to a safe random one
         // This allows the drone to go to directions that will take it back to positions it visited before.
@@ -120,26 +121,30 @@ public class StatefulDrone extends Drone{
 				}
 				// else just wander safely around in a random direction
 				else {
-					dir = null;
-				    //findRandomDirection();
+				    findRandomDirection();
 					System.out.println("Wandering Around!!!");
 				}
 			}
 			
 			
 			// Move towards the chosen direction, add the next position to the path and increment number of moves
-			if (dir != null) {
-			    this.move(dir);
-			}
-			
+			this.move(dir);
 			path.add(this.getPosition());
 			noOfMoves++;
 			
 			//System.out.println(dir);
 			System.out.println(noOfMoves);
 			
-			//Check if the drone happens to be in the range of any station
-			ChargingStation stationInRange = findClosestStation(map.stations, this.getPosition());
+			
+			ChargingStation stationInRange = null;
+			// if the drone has moved towards a station in any of the 16 directions charge from that station
+			if (stationInScope != null) {
+	            stationInRange = stationInScope;
+			}
+			else {
+			    //Check if the drone happens to be in the range of any station
+			    stationInRange = findClosestStation(map.stations, this.getPosition());
+			}
 			
 			// if the drone is indeed in the range of a station
 			if (stationInRange != null) {
