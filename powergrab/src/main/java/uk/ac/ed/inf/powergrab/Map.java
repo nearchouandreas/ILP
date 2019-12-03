@@ -8,7 +8,7 @@ public class Map {
     protected List<ChargingStation> badStations;// = new ArrayList<>();
     protected List<ChargingStation> goodStations;// = new ArrayList<>();
     
-    public float sumOfGood;
+    //public float sumOfGood;
     
     public Map(List<ChargingStation> stations) {
         this.stations = stations;
@@ -24,7 +24,7 @@ public class Map {
         for(ChargingStation station : stations) {
             if (station.isSafe()) {
                 this.goodStations.add(station);
-                this.sumOfGood += station.getCoins();
+                //this.sumOfGood += station.getCoins();
             }
             else{
                 this.badStations.add(station);

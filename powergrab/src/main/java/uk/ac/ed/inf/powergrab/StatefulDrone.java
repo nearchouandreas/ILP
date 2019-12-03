@@ -86,10 +86,7 @@ public class StatefulDrone extends Drone{
 		
 		List<Position> path = new ArrayList<>();
 		
-		//this.stations = stations;
 		this.map = map;
-		// separate stations into good and bad and store them in two separate lists
-		//map.separateStations(map.stations);
 		
 		ChargingStation goalStation = null;
 		int noOfMoves = 0;
@@ -172,14 +169,12 @@ public class StatefulDrone extends Drone{
 			
 			// Create the current line of the text file
 			detailedMoves += String.format("%s,%s,%s,%s,%s,%f,%f\n", path.get(noOfMoves-1).latitude, path.get(noOfMoves-1).longitude, dir, path.get(noOfMoves).latitude, path.get(noOfMoves).longitude, this.getCoins(), this.getPower());
-//			coinsHistory.add(this.getCoins());
-//	        powerHistory.add(this.getPower());
-//	        directionHistory.add(dir);
+
 			
 		}
 		System.out.println("Final power: " + this.getPower());
 		System.out.println("Final coins: " + this.getCoins());
-		System.out.println("Total coins: " + map.sumOfGood);
+		//System.out.println("Total coins: " + map.sumOfGood);
 		return path;
 	}
 	

@@ -9,11 +9,8 @@ public abstract class Drone {
 	private Position position;
 	
 	protected String detailedMoves = "";
-//	protected List<Double> coinsHistory = new ArrayList<Double>();
-//	protected List<Double> powerHistory = new ArrayList<Double>();
-//	protected List<Direction> directionHistory = new ArrayList<Direction>();
 	protected Map map;
-	protected Random rnd;
+	private Random rnd;
     protected Direction dir;
 	
     //public double sumOfGood;
@@ -172,7 +169,7 @@ public abstract class Drone {
             
         }
         // if there are 16 bad stations, go towards the best one.
-        if (allBad) {//noOfBad == 16) {
+        if (allBad) {
             dir = dirBestNegative;
             return bestNegativeStation;
         }
@@ -198,9 +195,9 @@ public abstract class Drone {
 		return this.position;
 	}
 	
-//	public Random getRnd() {
-//		return rnd;
-//	}
+	public Random getRnd() {
+		return rnd;
+	}
 	
 
 }

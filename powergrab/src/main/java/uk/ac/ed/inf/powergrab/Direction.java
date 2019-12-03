@@ -8,6 +8,7 @@ public enum Direction { // We enumerate all directions, so they can be used late
 	
     public static HashMap<Integer, Direction> directions = new HashMap<>();
     
+    // Creates he HashMap of directions
 	public static void dirByIndex(){
 		HashMap<Integer, Direction> dirs = new HashMap<>();
 		dirs.put(0, N);

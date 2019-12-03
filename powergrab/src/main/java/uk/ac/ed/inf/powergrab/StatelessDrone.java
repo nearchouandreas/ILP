@@ -61,10 +61,7 @@ public class StatelessDrone extends Drone{
 			
 			// Create the current line of the text file.
 			detailedMoves += String.format("%s,%s,%s,%s,%s,%f,%f\n", path.get(noOfMoves-1).latitude, path.get(noOfMoves-1).longitude, dir, path.get(noOfMoves).latitude, path.get(noOfMoves).longitude, this.getCoins(), this.getPower());
-//        		coinsHistory.add(this.getCoins());
-//        		powerHistory.add(this.getPower());
-//        		directionHistory.add(dir);
-			
+
 		}
 		System.out.println("moves: " + noOfMoves);
 		System.out.println("coins: " + this.getCoins());
