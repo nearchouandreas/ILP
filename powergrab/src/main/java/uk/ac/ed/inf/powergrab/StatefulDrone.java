@@ -134,7 +134,7 @@ public class StatefulDrone extends Drone{
 			
 			
 			ChargingStation stationInRange = null;
-			// if the drone has moved towards a station in any of the 16 directions charge from that station
+			// if the drone has moved towards a station in any of the 16 directions, charge from that station
 			if (stationInScope != null) {
 	            stationInRange = stationInScope;
 			}

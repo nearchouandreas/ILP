@@ -4,15 +4,15 @@ public class Position {
 
 	public double latitude;
 	public double longitude;
-	final double r = 0.0003; // The drone always travels this distance r
+	private final double r = 0.0003; // The drone always travels this distance r
 	
 	// The distance travelled in each direction is calculated above for efficiency.
-	final double sinDist67_5 = r*Math.sin(Math.toRadians(67.5));
-	final double cosDist67_5 = r*Math.cos(Math.toRadians(67.5));
-	final double sinDist45 = r*Math.sin(Math.toRadians(45));
-	final double cosDist45 = r*Math.cos(Math.toRadians(45));
-	final double sinDist22_5 = r*Math.sin(Math.toRadians(22.5));
-	final double cosDist22_5 = r*Math.cos(Math.toRadians(22.5));
+	private final double sinDist67_5 = r*Math.sin(Math.toRadians(67.5));
+	private final double cosDist67_5 = r*Math.cos(Math.toRadians(67.5));
+	private final double sinDist45 = r*Math.sin(Math.toRadians(45));
+	private final double cosDist45 = r*Math.cos(Math.toRadians(45));
+	private final double sinDist22_5 = r*Math.sin(Math.toRadians(22.5));
+	private final double cosDist22_5 = r*Math.cos(Math.toRadians(22.5));
 	
 	public Position(double latitude, double longitude) {
 		this.latitude = latitude;

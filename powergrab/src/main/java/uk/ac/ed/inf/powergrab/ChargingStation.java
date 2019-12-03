@@ -8,6 +8,8 @@ public class ChargingStation {
 	private boolean safe;
 	private Position coordinates;
 	
+	
+	// Constructor; initialises the variables
 	public ChargingStation (String id, float coins, float power, String markerSymbol, Position coordinates ) {
 		
 		this.id = id;
@@ -18,6 +20,7 @@ public class ChargingStation {
 		
 	}
 	
+	// Calculates distance of a point to the charging station
 	public double distance(Position position) {
 		
 		double x1 = position.longitude;
@@ -29,6 +32,7 @@ public class ChargingStation {
 		
 	}
 	
+	// Updates the values of station's power and coins to the ones given
 	public void updateValues(float coins, float power) {
 		
 		this.coins = coins;
@@ -52,7 +56,7 @@ public class ChargingStation {
 		return safe;
 	}
 
-	public Position getStationCoordinates() {
+	public Position getPosition() {
 		return coordinates;
 	}
 

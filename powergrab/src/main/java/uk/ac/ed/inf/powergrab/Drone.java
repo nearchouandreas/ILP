@@ -13,7 +13,6 @@ public abstract class Drone {
 	private Random rnd;
     protected Direction dir;
 	
-    //public double sumOfGood;
     
 	public Drone(Position initPosition, int seed) { // double initPower ,double initCoins,
 		
@@ -25,6 +24,7 @@ public abstract class Drone {
 
 	}
 	
+	// Calculates the new position of the drone given the direction. Then reduces the power.
 	protected void move(Direction direction) {
 		 
 		Position newPos = this.position.nextPosition(direction);

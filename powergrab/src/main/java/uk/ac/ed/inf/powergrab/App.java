@@ -5,13 +5,12 @@ import java.net.*;
 import org.apache.commons.io.IOUtils;
 import com.mapbox.geojson.*;
 import java.util.*;
-import com.google.gson.*;
 import java.time.*;
 
 public class App {
 	
     // Creates a list of stations out of the feature collection.
-	public static ArrayList<ChargingStation> createStationList(FeatureCollection fc){ 
+	private static ArrayList<ChargingStation> createStationList(FeatureCollection fc){ 
 		
 		ArrayList<ChargingStation> stations = new ArrayList<ChargingStation>();
 		for (Feature f : fc.features()) {
@@ -31,7 +30,7 @@ public class App {
 	}
 	
 	// Adds the path into the initial feature collection, as a line string.
-	public static FeatureCollection outputPath(List<Position> path, FeatureCollection fc) {
+	private static FeatureCollection outputPath(List<Position> path, FeatureCollection fc) {
 		
 		List<Point> pointsList = new ArrayList<Point>();
 		for (Position position : path) {
@@ -51,9 +50,9 @@ public class App {
 	}
 	
 	// Creates and outputs the files required.
-	public static void createOutputFiles(FeatureCollection fc, String detailedMoves, String name) {
+	private static void createOutputFiles(FeatureCollection fc, String detailedMoves, String name) {
 	    
-	    File filetxt = new File(String.format("/Users/andreas2/Documents/outILP/%s.txt", name));
+	    File filetxt = new File(String.format("/afs/inf.ed.ac.uk/user/s17/s1722294/Downloads/evaluator/%s.txt", name));
         
         //Create the text file
         try {
@@ -69,7 +68,7 @@ public class App {
             writertxt.write(detailedMoves);
             writertxt.close();
             
-            File filejson = new File(String.format("/Users/andreas2/Documents/outILP/%s.geojson", name));
+            File filejson = new File(String.format("/afs/inf.ed.ac.uk/user/s17/s1722294/Downloads/evaluator/%s.geojson", name));
             
             //Create the Json file
             if (filejson.createNewFile())
@@ -100,7 +99,7 @@ public class App {
             
             InputStream inputStream = conn.getInputStream(); 
             StringWriter writer = new StringWriter();
-            IOUtils.copy(inputStream, writer, "UTF-8"); //CHECK IF ADDING DEPENDENY IS ALLOWED!! APACHE!!
+            IOUtils.copy(inputStream, writer, "UTF-8"); 
             String mapSource = writer.toString();
             
             FeatureCollection fc = FeatureCollection.fromJson(mapSource);
@@ -110,9 +109,11 @@ public class App {
         } catch (MalformedURLException e) {
           //e.printStackTrace();
             System.out.println("URL not well formed");
+            System.exit(1);
         } catch (IOException e) {
           //e.printStackTrace();
             System.out.println("Invalid Input");
+            System.exit(1);
         }
         return null;
     }
@@ -134,11 +135,6 @@ public class App {
             
             // Remove the final new line character in the string containing the details of each move
             String allMoves = drone.detailedMoves.trim();
-//          for (int i = 0; i < path.size() - 2; i++) {
-//              allMoves += String.format("%s,%s,%s,%s,%s,%f,%f\n", path.get(i).latitude, path.get(i).longitude, drone.directionHistory.get(i), path.get(i+1).latitude, path.get(i+1).longitude, drone.coinsHistory.get(i), drone.powerHistory.get(i));
-//          }
-//          int n = path.size() - 2;
-//           allMoves += String.format("%s,%s,%s,%s,%s,%f,%f\n", path.get(n).latitude, path.get(n).longitude, drone.directionHistory.get(n), path.get(n+1).latitude, path.get(n+1).longitude, drone.coinsHistory.get(n), drone.powerHistory.get(n));
             
             // add the path to the initial feature collection
             FeatureCollection fcFinal = outputPath(path, fc); 
@@ -149,12 +145,11 @@ public class App {
             createOutputFiles(fcFinal, allMoves, name);
         }
         else {
-            return;
+            System.out.println("The map received is empty.");
+            System.exit(1);
         }
         
     }
-    
-	
 
     public static void main(String[] args) {
 		
@@ -166,32 +161,26 @@ public class App {
 		int seed = Integer.parseInt(args[5]);
 		String droneMode = args[6];
 
-//	    String year = "2019";
-//        String month = "12";
-//        String day = "14";
-        
         // Check if the date is valid and well formatted.
         try {
-            LocalDate date  = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
+             LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
         } catch (DateTimeException e){
             System.out.println("Invalid date entered.");
-            return;
+            System.exit(1);
         }
         
         // Create the string that is going to be used as the URL to retrieve the map.
         String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
-        //String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/02/02/powergrabmap.geojson";
         
         // Check if the initial position is within the play area.
         Position p1 = new Position(latitude, longitude);//55.944425, -3.188396);
         if (!p1.inPlayArea()) {
             System.out.println("Initial position is out of bounds.");
-            return;
+            System.exit(1);
         }
         
         // Create a drone depending on the drone mode and seed entered. If the drone mode is neither 'stateless' of 'stateful', then output an error message.
-        //String droneMode  = "stateful";
-        Drone drone;
+        Drone drone = null;
         if(droneMode.equals("stateless")) {
             drone = new StatelessDrone(p1, seed);
         }
@@ -200,7 +189,7 @@ public class App {
         }
         else {
             System.out.println("Invalid drone mode. Drone mode is either 'stateless' or 'statefull'.");
-            return;
+            System.exit(1);
         }
         
 	    double startTime = System.nanoTime();

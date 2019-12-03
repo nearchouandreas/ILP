@@ -16,7 +16,7 @@ public class Map {
     }
     
     // Separate good and bad stations
-    protected void separateStations(List<ChargingStation> stations) {
+    private void separateStations(List<ChargingStation> stations) {
         
         this.goodStations = new ArrayList<ChargingStation>();
         this.badStations = new ArrayList<ChargingStation>();
